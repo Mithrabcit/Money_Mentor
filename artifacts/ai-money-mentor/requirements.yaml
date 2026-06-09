@@ -1,0 +1,16 @@
+packages:
+  "framer-motion": "Smooth page transitions, form step animations, and polished micro-interactions"
+  "recharts": "Data visualization for gauge charts, line charts, and asset allocation pie charts"
+  "react-hook-form": "Form state management"
+  "@hookform/resolvers": "Zod integration for client-side validation"
+  "zod": "Schema validation for forms"
+
+images:
+  - path: "artifacts/ai-money-mentor/public/images/fintech-mesh.png"
+    description: "A very dark, premium, abstract 3D mesh background with subtle deep emerald green and gold glowing accents on a deep navy/black canvas. Suitable for a luxury wealth management dashboard hero section."
+    aspect_ratio: "16:9"
+
+notes:
+  - Expects the @workspace/api-client-react package to provide useCalculateMoneyHealthScore, useCalculateFirePlan, useAnalyzePortfolio hooks.
+  - App is designed primarily for a dark-mode, premium aesthetic by default.
+  - Currency formatting uses Indian Number System (Lakhs, Crores).

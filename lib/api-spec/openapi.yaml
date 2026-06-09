@@ -1,0 +1,483 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: AI Money Mentor API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: money-health
+    description: Money Health Score operations
+  - name: fire-planner
+    description: FIRE Path Planner operations
+  - name: portfolio
+    description: Mutual Fund Portfolio X-Ray operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /money-health/score:
+    post:
+      operationId: calculateMoneyHealthScore
+      tags: [money-health]
+      summary: Calculate Money Health Score
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MoneyHealthInput"
+      responses:
+        "200":
+          description: Money Health Score result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MoneyHealthResult"
+
+  /fire-planner/plan:
+    post:
+      operationId: calculateFirePlan
+      tags: [fire-planner]
+      summary: Calculate FIRE Path Plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FirePlannerInput"
+      responses:
+        "200":
+          description: FIRE Plan result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FirePlanResult"
+
+  /portfolio/analyze:
+    post:
+      operationId: analyzePortfolio
+      tags: [portfolio]
+      summary: Analyze mutual fund portfolio (upload statement)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                useSample:
+                  type: boolean
+      responses:
+        "200":
+          description: Portfolio analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioAnalysisResult"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    MoneyHealthInput:
+      type: object
+      properties:
+        age:
+          type: number
+        monthlyIncome:
+          type: number
+        monthlyExpenses:
+          type: number
+        dependents:
+          type: number
+        currentSavings:
+          type: number
+        emiAmount:
+          type: number
+        currentInvestments:
+          type: number
+        lifeInsuranceCover:
+          type: number
+        healthInsuranceCover:
+          type: number
+        taxSavingInvestments:
+          type: number
+        hasRetirementPlan:
+          type: boolean
+        epfBalance:
+          type: number
+      required:
+        - age
+        - monthlyIncome
+        - monthlyExpenses
+        - dependents
+        - currentSavings
+        - emiAmount
+        - currentInvestments
+        - lifeInsuranceCover
+        - healthInsuranceCover
+        - taxSavingInvestments
+        - hasRetirementPlan
+        - epfBalance
+
+    MoneyHealthDimension:
+      type: object
+      properties:
+        name:
+          type: string
+        score:
+          type: number
+        maxScore:
+          type: number
+        status:
+          type: string
+          enum: [excellent, good, fair, poor]
+        explanation:
+          type: string
+        recommendation:
+          type: string
+      required:
+        - name
+        - score
+        - maxScore
+        - status
+        - explanation
+        - recommendation
+
+    MoneyHealthResult:
+      type: object
+      properties:
+        totalScore:
+          type: number
+        grade:
+          type: string
+        dimensions:
+          type: array
+          items:
+            $ref: "#/components/schemas/MoneyHealthDimension"
+        summaryAlerts:
+          type: array
+          items:
+            type: string
+        topRecommendations:
+          type: array
+          items:
+            type: string
+      required:
+        - totalScore
+        - grade
+        - dimensions
+        - summaryAlerts
+        - topRecommendations
+
+    FirePlannerInput:
+      type: object
+      properties:
+        age:
+          type: number
+        monthlyIncome:
+          type: number
+        monthlyExpenses:
+          type: number
+        dependents:
+          type: number
+        currentSavings:
+          type: number
+        currentInvestments:
+          type: number
+        emiAmount:
+          type: number
+        targetRetirementAge:
+          type: number
+        expectedInflation:
+          type: number
+        expectedReturnRate:
+          type: number
+        riskProfile:
+          type: string
+          enum: [conservative, moderate, aggressive]
+        goals:
+          type: array
+          items:
+            $ref: "#/components/schemas/FinancialGoal"
+      required:
+        - age
+        - monthlyIncome
+        - monthlyExpenses
+        - dependents
+        - currentSavings
+        - currentInvestments
+        - emiAmount
+        - targetRetirementAge
+        - expectedInflation
+        - expectedReturnRate
+        - riskProfile
+        - goals
+
+    FinancialGoal:
+      type: object
+      properties:
+        name:
+          type: string
+        targetAmount:
+          type: number
+        targetYear:
+          type: number
+        currentSavings:
+          type: number
+      required:
+        - name
+        - targetAmount
+        - targetYear
+        - currentSavings
+
+    SipGoal:
+      type: object
+      properties:
+        goalName:
+          type: string
+        targetAmount:
+          type: number
+        targetYear:
+          type: number
+        requiredSip:
+          type: number
+        fundingGap:
+          type: number
+        projectedCorpus:
+          type: number
+      required:
+        - goalName
+        - targetAmount
+        - targetYear
+        - requiredSip
+        - fundingGap
+        - projectedCorpus
+
+    AssetAllocation:
+      type: object
+      properties:
+        equity:
+          type: number
+        debt:
+          type: number
+        gold:
+          type: number
+        realEstate:
+          type: number
+      required:
+        - equity
+        - debt
+        - gold
+        - realEstate
+
+    RetirementProjection:
+      type: object
+      properties:
+        year:
+          type: number
+        age:
+          type: number
+        corpus:
+          type: number
+      required:
+        - year
+        - age
+        - corpus
+
+    FirePlanResult:
+      type: object
+      properties:
+        fireNumber:
+          type: number
+        retirementCorpus:
+          type: number
+        monthsToFire:
+          type: number
+        emergencyFundTarget:
+          type: number
+        totalMonthlySip:
+          type: number
+        sipGoals:
+          type: array
+          items:
+            $ref: "#/components/schemas/SipGoal"
+        assetAllocation:
+          $ref: "#/components/schemas/AssetAllocation"
+        retirementProjections:
+          type: array
+          items:
+            $ref: "#/components/schemas/RetirementProjection"
+        taxOptimizations:
+          type: array
+          items:
+            type: string
+        insuranceGap:
+          type: object
+          properties:
+            lifeInsurance:
+              type: number
+            healthInsurance:
+              type: number
+          required:
+            - lifeInsurance
+            - healthInsurance
+        actionChecklist:
+          type: array
+          items:
+            type: string
+      required:
+        - fireNumber
+        - retirementCorpus
+        - monthsToFire
+        - emergencyFundTarget
+        - totalMonthlySip
+        - sipGoals
+        - assetAllocation
+        - retirementProjections
+        - taxOptimizations
+        - insuranceGap
+        - actionChecklist
+
+    MutualFundHolding:
+      type: object
+      properties:
+        schemeName:
+          type: string
+        category:
+          type: string
+        subCategory:
+          type: string
+        folioNo:
+          type: string
+        units:
+          type: number
+        nav:
+          type: number
+        investedValue:
+          type: number
+        currentValue:
+          type: number
+        gainLoss:
+          type: number
+        gainLossPercent:
+          type: number
+        expenseRatio:
+          type: number
+      required:
+        - schemeName
+        - category
+        - subCategory
+        - folioNo
+        - units
+        - nav
+        - investedValue
+        - currentValue
+        - gainLoss
+        - gainLossPercent
+        - expenseRatio
+
+    CategoryAllocation:
+      type: object
+      properties:
+        category:
+          type: string
+        value:
+          type: number
+        percentage:
+          type: number
+      required:
+        - category
+        - value
+        - percentage
+
+    FundOverlap:
+      type: object
+      properties:
+        fund1:
+          type: string
+        fund2:
+          type: string
+        overlapPercent:
+          type: number
+        commonStocks:
+          type: number
+      required:
+        - fund1
+        - fund2
+        - overlapPercent
+        - commonStocks
+
+    PortfolioAnalysisResult:
+      type: object
+      properties:
+        totalInvestedValue:
+          type: number
+        totalCurrentValue:
+          type: number
+        totalGainLoss:
+          type: number
+        totalGainLossPercent:
+          type: number
+        xirr:
+          type: number
+        holdings:
+          type: array
+          items:
+            $ref: "#/components/schemas/MutualFundHolding"
+        categoryAllocation:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoryAllocation"
+        fundOverlaps:
+          type: array
+          items:
+            $ref: "#/components/schemas/FundOverlap"
+        expenseDrag:
+          type: number
+        benchmarkReturn:
+          type: number
+        recommendations:
+          type: array
+          items:
+            type: string
+        rebalancingSuggestions:
+          type: array
+          items:
+            type: string
+      required:
+        - totalInvestedValue
+        - totalCurrentValue
+        - totalGainLoss
+        - totalGainLossPercent
+        - xirr
+        - holdings
+        - categoryAllocation
+        - fundOverlaps
+        - expenseDrag
+        - benchmarkReturn
+        - recommendations
+        - rebalancingSuggestions
